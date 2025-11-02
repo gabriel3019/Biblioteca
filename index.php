@@ -1,8 +1,9 @@
 <?php
 
-// $conn = new mysqli("localhost", "root", "", "biblioteca");
-// if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
+$conn = new mysqli("localhost", "root", "", "biblioteca");
+if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -15,8 +16,8 @@
 
 <!-- REGISTRAR NUEVO LECTOR -->
 <h2>Registrar nuevo lector</h2>
-<form action="procesar.php" method="post">
-    <input type="hidden" name="accion" value="registrar_lector">
+<form action="/Biblioteca/Biblioteca/CRUD/procesar.php" method="POST">
+    <input type="hidden" name="accion" value="registrarlector">
     Nombre y apellidos: <input type="text" id="nombre_apellidos" name="nombre_apellidos" placeholder="Nombre y apellidos"required><br><br>
     DNI: <input type="text" id="dni" name="dni" maxlength="9" placeholder="Introduce tu DNI" required><br><br>
     
@@ -25,8 +26,8 @@
 
 <!-- AÑADIR LIBRO -->
 <h2>Añadir libro al catálogo</h2>
-<form action="procesar.php" method="post">
-    <input type="hidden" name="accion" value="añadir_libro">
+<form action="/Biblioteca/Biblioteca/CRUD/procesar.php" method="POST">
+    <input type="hidden" name="accion" value="anadirlibro">
 
     Nombre del libro: <input type="text" id="nombre" name="nombre" placeholder="Introduce el nombre" required><br><br>
     Autor: <input type="text" id="autor" name="autor" placeholder="Introduce el autor" required><br><br>
@@ -40,43 +41,67 @@
 
 <!-- REALIZAR PRÉSTAMO -->
 <h2>Realizar préstamo</h2>
-<form action="procesar.php" method="post">
+<form action="/Biblioteca/Biblioteca/CRUD/procesar.php" method="POST">
     <input type="hidden" name="accion" value="prestar">
+
     Lector:
     <select name="lector" required>
         <option value="">Selecciona lector</option>
         <?php
-        $lectores = $conn->query("SELECT * FROM lectores WHERE estado='activo'");
-        while ($l = $lectores->fetch_assoc()) echo "<option value='{$l['id']}'>{$l['nombre']} ({$l['dni']})</option>";
+        $lectores = $conn->query("SELECT * FROM lectores WHERE estado='alta'");
+        if ($lectores && $lectores->num_rows > 0) {
+            while ($l = $lectores->fetch_assoc()) {
+                echo "<option value='{$l['id']}'>{$l['lector']} ({$l['DNI']})</option>";
+            }
+        } else {
+            echo "<option disabled>No hay lectores dados de alta</option>";
+        }
         ?>
     </select>
+
     Libro:
     <select name="libro" required>
         <option value="">Selecciona libro</option>
         <?php
-        $libros = $conn->query("SELECT * FROM libros WHERE disponible=1");
-        while ($b = $libros->fetch_assoc()) echo "<option value='{$b['id']}'>{$b['titulo']}</option>";
+        // Muestra solo libros con ejemplares disponibles
+        $libros = $conn->query("SELECT * FROM libros WHERE n_disponibles > 0");
+        if ($libros && $libros->num_rows > 0) {
+            while ($b = $libros->fetch_assoc()) {
+                echo "<option value='{$b['id']}'>{$b['nombre']}</option>";
+            }
+        } else {
+            echo "<option disabled>No hay libros disponibles</option>";
+        }
         ?>
     </select>
+
     <input type="submit" value="Prestar libro">
 </form>
 
 <!-- DEVOLVER PRÉSTAMO -->
 <h2>Devolver préstamo</h2>
-<form action="procesar.php" method="post">
+<form action="/Biblioteca/Biblioteca/CRUD/procesar.php" method="POST">
     <input type="hidden" name="accion" value="devolver">
     <select name="prestamo" required>
         <option value="">Selecciona préstamo</option>
         <?php
-        $prestamos = $conn->query("SELECT p.id, l.nombre, b.titulo
-                                   FROM prestamos p
-                                   JOIN lectores l ON p.id_lector=l.id
-                                   JOIN libros b ON p.id_libro=b.id");
-        if ($prestamos->num_rows == 0) {
-            echo "<option disabled>No hay préstamos registrados</option>";
+        $prestamos = $conn->query("
+            SELECT p.id_lector, p.id_libro, l.lector AS nombre_lector, b.nombre AS nombre_libro
+            FROM prestamos p
+            JOIN lectores l ON p.id_lector = l.id
+            JOIN libros b ON p.id_libro = b.id
+        ");
+
+        if (!$prestamos) {
+            echo "<option disabled> Error en la consulta: " . $conn->error . "</option>";
+        } elseif ($prestamos->num_rows == 0) {
+            echo "<option disabled> No hay préstamos registrados</option>";
         } else {
-            while ($p = $prestamos->fetch_assoc())
-                echo "<option value='{$p['id']}'>{$p['nombre']} - {$p['titulo']}</option>";
+            while ($p = $prestamos->fetch_assoc()) {
+                // Usamos una clave compuesta para identificar el préstamo
+                $valor = $p['id_lector'] . "-" . $p['id_libro'];
+                echo "<option value='{$valor}'>{$p['nombre_lector']} - {$p['nombre_libro']}</option>";
+            }
         }
         ?>
     </select>
@@ -85,16 +110,18 @@
 
 <!-- DAR DE BAJA LECTOR -->
 <h2>Dar de baja lector</h2>
-<form action="procesar.php" method="post">
+<form action="/Biblioteca/Biblioteca/CRUD/procesar.php" method="POST">
     <input type="hidden" name="accion" value="baja">
     <select name="lector_baja" required>
         <option value="">Selecciona lector</option>
         <?php
-        $lectores = $conn->query("SELECT * FROM lectores WHERE estado='activo'");
-        if ($lectores->num_rows == 0) {
-            echo "<option disabled>No hay lectores activos</option>";
+        $lectores = $conn->query("SELECT * FROM lectores WHERE estado='alta'");
+        if ($lectores && $lectores->num_rows > 0) {
+            while ($l = $lectores->fetch_assoc()) {
+                echo "<option value='{$l['id']}'>{$l['lector']} ({$l['DNI']})</option>";
+            }
         } else {
-            while ($l = $lectores->fetch_assoc()) echo "<option value='{$l['id']}'>{$l['nombre']} ({$l['dni']})</option>";
+            echo "<option disabled>No hay lectores dados de alta</option>";
         }
         ?>
     </select>
@@ -105,11 +132,13 @@
 <h2>Catálogo de libros disponibles</h2>
 <ul>
 <?php
-$libros = $conn->query("SELECT * FROM libros WHERE disponible=1");
-if ($libros->num_rows == 0) {
+$libros = $conn->query("SELECT * FROM libros WHERE n_disponibles > 0");
+if (!$libros || $libros->num_rows == 0) {
     echo "<li>No hay libros disponibles actualmente</li>";
 } else {
-    while ($b = $libros->fetch_assoc()) echo "<li>{$b['titulo']} - {$b['autor']}</li>";
+    while ($b = $libros->fetch_assoc()) {
+        echo "<li>{$b['nombre']} - {$b['autor']} ({$b['n_disponibles']} disponibles)</li>";
+    }
 }
 ?>
 </ul>
@@ -121,7 +150,9 @@ if ($libros->num_rows == 0) {
         <option value="">Selecciona lector</option>
         <?php
         $lectores = $conn->query("SELECT * FROM lectores");
-        while ($l = $lectores->fetch_assoc()) echo "<option value='{$l['id']}'>{$l['nombre']} ({$l['dni']})</option>";
+        while ($l = $lectores->fetch_assoc()) {
+            echo "<option value='{$l['id']}'>{$l['lector']} ({$l['DNI']})</option>";
+        }
         ?>
     </select>
     <input type="submit" value="Consultar">
@@ -129,15 +160,18 @@ if ($libros->num_rows == 0) {
 
 <?php
 if (isset($_GET['id_lector_consulta'])) {
-    $id = $_GET['id_lector_consulta'];
-    $prestamos = $conn->query("SELECT b.titulo FROM prestamos p
+    $id = (int) $_GET['id_lector_consulta']; 
+    $prestamos = $conn->query("SELECT b.nombre 
+                               FROM prestamos p
                                JOIN libros b ON p.id_libro=b.id
                                WHERE p.id_lector=$id");
-    if ($prestamos->num_rows == 0) {
+    if (!$prestamos || $prestamos->num_rows == 0) {
         echo "<p>Este lector no tiene préstamos. ¡Anímate a leer!</p>";
     } else {
         echo "<ul>";
-        while ($p = $prestamos->fetch_assoc()) echo "<li>{$p['titulo']}</li>";
+        while ($p = $prestamos->fetch_assoc()) {
+            echo "<li>{$p['nombre']}</li>";
+        }
         echo "</ul>";
     }
 }
