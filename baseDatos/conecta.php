@@ -1,22 +1,29 @@
 <?php
-
 $servidor = "localhost";
 $usuario = "root";
-$password = ""; // Vacío significa que no hay contraseña para acceder
-$database = "biblioteca"; // El nombre de la base para el supermercado
+$password = "";
+$database = "biblioteca";
 
-$conexion = new mysqli($servidor, $usuario, $password);
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-} else {
-    $sql = "SHOW DATABASES like '$database'";
-    if (! $registro = $conexion->query($sql)) {
-        echo "Error al crear la base: " . $conexion->connect_error;
-    }
-    if($registro->num_rows <= 0){
-        include_once "tablas.php";
-    }
-    $conexion->select_db($database); 
+// Creamos conexión y la guardamos en $conn
+$conn = new mysqli($servidor, $usuario, $password);
+
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
 }
 
+// Comprobamos si existe la base de datos
+$sql = "SHOW DATABASES LIKE '$database'";
+$registro = $conn->query($sql);
+
+if (!$registro) {
+    die("Error al comprobar la base de datos: " . $conn->error);
+}
+
+// Si no existe, la crea automáticamente
+if ($registro->num_rows <= 0) {
+    include_once "tablas.php";
+}
+
+// Seleccionamos la base
+$conn->select_db($database);
 ?>
