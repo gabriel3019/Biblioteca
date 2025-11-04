@@ -15,21 +15,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $id_libro = (int) $_POST["libro"];
 
     // Consultar cuántos ejemplares del libro están disponibles
-    $check = $conn->query("SELECT n_disponibles FROM libros WHERE id=$id_libro");
+    $check = $conn->query("SELECT n_disponibles FROM libros WHERE id_libros=$id_libro");
     $disponibles = $check->fetch_assoc()["n_disponibles"];
 
     // Si hay ejemplares disponibles, registrar el préstamo
     if ($disponibles > 0) {
         // Insertar el préstamo en la tabla "prestamos"
-        $conn->query("INSERT INTO prestamos (id_lector, id_libro) VALUES ($id_lector, $id_libro)");
-        // Reducir el número de ejemplares disponibles del libro
-        $conn->query("UPDATE libros SET n_disponibles = n_disponibles - 1 WHERE id=$id_libro");
-        // Aumentar el contador de préstamos del lector
-        $conn->query("UPDATE lectores SET n_prestado = n_prestado + 1 WHERE id=$id_lector");
+        $conn->query("INSERT INTO prestamos (id_lectores, id_libros) VALUES ($id_lector, $id_libro)");
+
+        // Reducir el número de ejemplares disponibles
+        $conn->query("UPDATE libros SET n_disponibles = n_disponibles - 1 WHERE id_libros=$id_libro");
+
+        // Aumentar el número de préstamos del lector
+        $conn->query("UPDATE lectores SET n_prestado = n_prestado + 1 WHERE id_lectores=$id_lector");
 
         echo "<p>Préstamo registrado correctamente.</p>";
     } else {
-        // Si no hay ejemplares, mostrar mensaje de error
         echo "<p>No hay ejemplares disponibles de ese libro.</p>";
     }
 }

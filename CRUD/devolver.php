@@ -7,33 +7,28 @@ $database = "biblioteca";
 
 $conn = new mysqli($servername, $username, $password, $database);
 
-// Ejecutar solo si el formulario se envía por POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (!isset($_POST['prestamo']) || empty($_POST['prestamo'])) {
+        echo "<p>Error: no se seleccionó ningún préstamo.</p>";
+    } else {
+        // Separar el valor "id_lector-id_libro"
+        list($id_lector, $id_libro) = explode('-', $_POST['prestamo']);
+        $id_lector = (int) $id_lector;
+        $id_libro = (int) $id_libro;
 
-    // Obtener el ID del préstamo desde el formulario
-    $id_prestamo = (int) $_POST["prestamo"];
+        // Eliminar préstamo correspondiente
+        $conn->query("DELETE FROM prestamos WHERE id_lector=$id_lector AND id_libro=$id_libro");
 
-    // Buscar los datos del préstamo (lector y libro)
-    $datos = $conn->query("SELECT id_lector, id_libro FROM prestamos WHERE id=$id_prestamo")->fetch_assoc();
-    $id_lector = $datos["id_lector"];
-    $id_libro = $datos["id_libro"];
+        // Aumentar libros disponibles
+        $conn->query("UPDATE libros SET n_disponibles = n_disponibles + 1 WHERE id=$id_libro");
 
-    // Eliminar el préstamo de la tabla "prestamos"
-    $conn->query("DELETE FROM prestamos WHERE id=$id_prestamo");
+        // Disminuir préstamos del lector
+        $conn->query("UPDATE lectores SET n_prestado = n_prestado - 1 WHERE id=$id_lector");
 
-    // Aumentar la cantidad de libros disponibles
-    $conn->query("UPDATE libros SET n_disponibles = n_disponibles + 1 WHERE id=$id_libro");
-
-    // Disminuir el número de préstamos activos del lector
-    $conn->query("UPDATE lectores SET n_prestado = n_prestado - 1 WHERE id=$id_lector");
-
-    // Mensaje de confirmación
-    echo "<p>Libro devuelto correctamente.</p>";
+        echo "<p>Libro devuelto correctamente.</p>";
+    }
 }
 
-// Enlace para volver al inicio
 echo '<br><a href="../index.php">Volver al inicio</a>';
-
-// Cerrar la conexión
 $conn->close();
 ?>
