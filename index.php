@@ -28,7 +28,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- AÑADIR LIBRO -->
     <h2>Añadir libro al catálogo</h2>
-    <form action="CRUD/anadir_libro.php" method="POST">
+    <form action="DWES/CRUD/anadir_libro.php" method="POST">
         <input type="hidden" name="accion" value="anadirlibro">
 
         Nombre del libro: <input type="text" id="nombre" name="nombre" placeholder="Introduce el nombre" required><br><br>
@@ -40,10 +40,10 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
         <input type="submit" value="Añadir libro">
     </form>
-    
+
     <!-- REALIZAR PRÉSTAMO -->
     <h2>Realizar préstamo</h2>
-    <form action="CRUD/prestar.php" method="POST">
+    <form action="DWES/CRUD/prestar.php" method="POST">
         <input type="hidden" name="accion" value="prestar">
 
         Lector:
@@ -82,7 +82,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- DEVOLVER PRÉSTAMO -->
     <h2>Devolver préstamo</h2>
-    <form action="CRUD/devolver.php" method="POST">
+    <form action="DWES/CRUD/devolver.php" method="POST">
         <input type="hidden" name="accion" value="devolver">
         <select name="prestamo" required>
             <option value="">Selecciona préstamo</option>
@@ -112,7 +112,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- DAR DE BAJA LECTOR -->
     <h2>Dar de baja lector</h2>
-    <form action="CRUD/baja_lector.php" method="POST">
+    <form action="DWES/CRUD/baja_lector.php" method="POST">
         <input type="hidden" name="accion" value="baja">
         <select name="lector_baja" required>
             <option value="">Selecciona lector</option>
