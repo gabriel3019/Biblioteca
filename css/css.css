@@ -1,0 +1,24 @@
+body {
+    background-image: url(biblio.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0px;
+    color: lightgrey;
+    font-family: sans-serif;
+    text-align: center;
+}
+form{
+    font-size: 16px;
+    border-radius: 5%;
+}
+input{
+    border-radius: 5%;
+    font-size: 16px;
+}
+h2{
+    border-radius: 5%;
+    text-align: center;
+    background-color: darkred;
+    color: lightgoldenrodyellow;
+    opacity: 0.8;
+}
