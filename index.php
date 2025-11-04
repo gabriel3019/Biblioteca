@@ -18,7 +18,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- REGISTRAR NUEVO LECTOR -->
     <h2>Registrar nuevo lector</h2>
-    <form action="DWES/CRUD/registrar_lector.php" method="POST">
+    <form action="CRUD/registrar_lector.php" method="POST">
         <input type="hidden" name="accion" value="registrarlector">
         Nombre y apellidos: <input type="text" id="nombre_apellidos" name="nombre_apellidos" placeholder="Nombre y apellidos" required><br><br>
         DNI: <input type="text" id="dni" name="dni" maxlength="9" placeholder="Introduce tu DNI" required><br><br>
@@ -28,7 +28,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- AÑADIR LIBRO -->
     <h2>Añadir libro al catálogo</h2>
-    <form action="DWES/CRUD/anadir_libro.php" method="POST">
+    <form action="CRUD/anadir_libro.php" method="POST">
         <input type="hidden" name="accion" value="anadirlibro">
 
         Nombre del libro: <input type="text" id="nombre" name="nombre" placeholder="Introduce el nombre" required><br><br>
@@ -43,7 +43,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- REALIZAR PRÉSTAMO -->
     <h2>Realizar préstamo</h2>
-    <form action="DWES/CRUD/prestar.php" method="POST">
+    <form action="CRUD/prestar.php" method="POST">
         <input type="hidden" name="accion" value="prestar">
 
         Lector:
@@ -82,7 +82,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- DEVOLVER PRÉSTAMO -->
     <h2>Devolver préstamo</h2>
-    <form action="DWES/CRUD/devolver.php" method="POST">
+    <form action="CRUD/devolver.php" method="POST">
         <input type="hidden" name="accion" value="devolver">
         <select name="prestamo" required>
             <option value="">Selecciona préstamo</option>
@@ -112,7 +112,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     <!-- DAR DE BAJA LECTOR -->
     <h2>Dar de baja lector</h2>
-    <form action="DWES/CRUD/baja_lector.php" method="POST">
+    <form action="CRUD/baja_lector.php" method="POST">
         <input type="hidden" name="accion" value="baja">
         <select name="lector_baja" required>
             <option value="">Selecciona lector</option>
