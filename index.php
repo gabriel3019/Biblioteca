@@ -11,6 +11,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Biblioteca</title>
+    <link rel="stylesheet" href="css/css.css">
 </head>
 
 <body>
